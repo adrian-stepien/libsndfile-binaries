@@ -106,5 +106,9 @@ workflows:
   build_mac_arm64:
     jobs:
       - build_libogg
-      - build_libvorbis   
-      - build_libflac 
+      - build_libvorbis:
+          requires: 
+            - build_libogg
+      - build_libflac:
+           requires: 
+            - build_libogg
