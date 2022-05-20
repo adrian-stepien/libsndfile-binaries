@@ -61,7 +61,7 @@ jobs:
           command: tar zxvf libvorbis-<<pipeline.parameters.VORBISVERSION>>.tar.gz
       - run:
           name: "Configure build"
-          command: ./configure --disable-shared --with-ogg-includes=../libogg-<<pipeline.parameters.OGGVERSION>>/include --with-ogg-libraries=../libogg-<<pipeline.parameters.OGGVERSION>>/src/.libs
+          command: ./configure --disable-shared --with-ogg-includes=~/libogg-<<pipeline.parameters.OGGVERSION>>/include --with-ogg-libraries=~/libogg-<<pipeline.parameters.OGGVERSION>>/src/.libs
           working_directory: ~/libvorbis-<<pipeline.parameters.VORBISVERSION>>
           environment:
             MACOSX_DEPLOYMENT_TARGET: 10.9
@@ -85,7 +85,7 @@ jobs:
             tar zxvf flac-<<pipeline.parameters.FLACVERSION>>.tar
       - run:
           name: "Configure build"
-          command: ./configure --enable-static --disable-shared --with-ogg-includes=../libogg-<<pipeline.parameters.OGGVERSION>>/include --with-ogg-libraries=../libogg-<<pipeline.parameters.OGGVERSION>>/src/.libs
+          command: ./configure --enable-static --disable-shared --with-ogg-includes=~/libogg-<<pipeline.parameters.OGGVERSION>>/include --with-ogg-libraries=~/libogg-<<pipeline.parameters.OGGVERSION>>/src/.libs
           working_directory: ~/flac-<<pipeline.parameters.FLACVERSION>>
           environment:
             MACOSX_DEPLOYMENT_TARGET: 10.9
