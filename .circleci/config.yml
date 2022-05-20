@@ -130,7 +130,7 @@ jobs:
     steps:
       - run:
           name: "Fetch library"
-          command: curl -LO https://deac-ams.dl.sourceforge.net/project/mpg123/mpg123/$MPG123VERSION/mpg123-<<pipeline.parameters.MPG123VERSION>>.tar.bz2
+          command: curl -LO https://deac-ams.dl.sourceforge.net/project/mpg123/mpg123/<<pipeline.parameters.MPG123VERSION>>/mpg123-<<pipeline.parameters.MPG123VERSION>>.tar.bz2
       - run:
           name: "Unpack library"
           command: tar zxvf mpg123-<<pipeline.parameters.MPG123VERSION>>.tar.bz2
@@ -152,7 +152,7 @@ jobs:
     steps:
       - run:
           name: "Fetch library"
-          command: curl -LO https://deac-ams.dl.sourceforge.net/project/lame/lame/$LAMEVERSION/lame-<<pipeline.parameters.LAMEVERSION>>.tar.gz
+          command: curl -LO https://deac-ams.dl.sourceforge.net/project/lame/lame/<<pipeline.parameters.LAMEVERSION>>/lame-<<pipeline.parameters.LAMEVERSION>>.tar.gz
       - run:
           name: "Unpack library"
           command: tar zxvf lame-<<pipeline.parameters.LAMEVERSION>>.tar.gz
@@ -166,7 +166,31 @@ jobs:
       - run:
           name: "Build"
           command: make -j8
-          working_directory: lame-<<pipeline.parameters.LAMEVERSION>>       
+          working_directory: lame-<<pipeline.parameters.LAMEVERSION>>
+
+  build_libsndfile:
+    macos:
+      xcode: 13.3
+    steps:
+      - run:
+          name: "Fetch library"
+          command: curl -LO https://github.com/libsndfile/libsndfile/releases/download/<<pipeline.parameters.SNDFILE_VERSION>>/libsndfile-<<pipeline.parameters.SNDFILE_VERSION>>.tar.xz
+      - run:
+          name: "Unpack library"
+          command: tar jxvf libsndfile-<<pipeline.parameters.SNDFILE_VERSION>>.tar.xz
+      - run:
+          name: "Configure build"
+          command: ./configure --disable-static --disable-sqlite --disable-alsa
+          working_directory: libsndfile-<<pipeline.parameters.SNDFILE_VERSION>>
+          environment:
+            MACOSX_DEPLOYMENT_TARGET: 10.9
+            ARCH: arm64
+            FLAC_CFLAGS: 
+            FLAC_LIBS:
+      - run:
+          name: "Build"
+          command: make -j8
+          working_directory: lame-<<pipeline.parameters.LAMEVERSION>>          
 
 workflows:
   build_mac_arm64:
