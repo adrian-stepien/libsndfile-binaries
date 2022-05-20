@@ -122,7 +122,7 @@ jobs:
       - run:
           name: "Build"
           command: make -j8
-          working_directory: flac-<<pipeline.parameters.OPUSVERSION>>
+          working_directory: opus-<<pipeline.parameters.OPUSVERSION>>
 
   build_mpg123:
     macos:
