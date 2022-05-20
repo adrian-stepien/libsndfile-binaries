@@ -25,13 +25,6 @@ parameters:
   SNDFILENAME:
     type: string
     default: libsndfile-<< pipeline.parameters.SNDFILE_VERSION>>
-  OGG_INCDIR: 
-    type: string
-    default: libogg-<<pipeline.parameters.OGGVERSION>>/include
-  OGG_LIBDIR: 
-    type: string
-    default: libogg-<<pipeline.parameters.OGGVERSION>>/src/.libs
-
 
 jobs:
   build_libogg:
@@ -68,7 +61,7 @@ jobs:
           command: tar zxvf libvorbis-<<pipeline.parameters.VORBISVERSION>>.tar.gz
       - run:
           name: "Configure build"
-          command: ./configure --disable-shared --with-ogg-includes=../<<pipeline.parameters.OGG_INCDIR>> --with-ogg-libraries=../<<pipeline.parameters.OGG_LIBDIR>>
+          command: ./configure --disable-shared --with-ogg-includes=../libogg-<<pipeline.parameters.OGGVERSION>>/include --with-ogg-libraries=../libogg-<<pipeline.parameters.OGGVERSION>>/src/.libs
           working_directory: libvorbis-<<pipeline.parameters.VORBISVERSION>>
           environment:
             MACOSX_DEPLOYMENT_TARGET: 10.9
@@ -92,7 +85,7 @@ jobs:
             tar zxvf flac-<<pipeline.parameters.FLACVERSION>>.tar
       - run:
           name: "Configure build"
-          command: ./configure --enable-static --disable-shared --with-ogg-includes=../<<pipeline.parameters.OGG_INCDIR>> --with-ogg-libraries=../<<pipeline.parameters.OGG_LIBDIR>>
+          command: ./configure --enable-static --disable-shared --with-ogg-includes=../libogg-<<pipeline.parameters.OGGVERSION>>/include --with-ogg-libraries=../libogg-<<pipeline.parameters.OGGVERSION>>/src/.libs
           working_directory: flac-<<pipeline.parameters.FLACVERSION>>
           environment:
             MACOSX_DEPLOYMENT_TARGET: 10.9
