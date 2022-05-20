@@ -22,9 +22,6 @@ parameters:
   SNDFILE_VERSION:
     type: string
     default: "1.1.0"
-  SNDFILENAME:
-    type: string
-    default: libsndfile-<< pipeline.parameters.SNDFILE_VERSION>>
 
 jobs:
   build_libogg:
@@ -40,14 +37,14 @@ jobs:
       - run:
           name: "Configure build"
           command: ./configure --disable-shared
-          working_directory: ~/libogg-<<pipeline.parameters.OGGVERSION>>
+          working_directory: libogg-<<pipeline.parameters.OGGVERSION>>
           environment:
             MACOSX_DEPLOYMENT_TARGET: 10.9
             ARCH: arm64
       - run:
           name: "Build"
           command: make -j8
-          working_directory: ~/libogg-<<pipeline.parameters.OGGVERSION>>
+          working_directory: libogg-<<pipeline.parameters.OGGVERSION>>
 
   build_libvorbis:
     macos:
@@ -61,15 +58,15 @@ jobs:
           command: tar zxvf libvorbis-<<pipeline.parameters.VORBISVERSION>>.tar.gz
       - run:
           name: "Configure build"
-          command: ./configure --disable-shared --with-ogg-includes=~/libogg-<<pipeline.parameters.OGGVERSION>>/include --with-ogg-libraries=~/libogg-<<pipeline.parameters.OGGVERSION>>/src/.libs
-          working_directory: ~/libvorbis-<<pipeline.parameters.VORBISVERSION>>
+          command: ./configure --disable-shared --with-ogg-includes=../libogg-<<pipeline.parameters.OGGVERSION>>/include --with-ogg-libraries=../libogg-<<pipeline.parameters.OGGVERSION>>/src/.libs
+          working_directory: libvorbis-<<pipeline.parameters.VORBISVERSION>>
           environment:
             MACOSX_DEPLOYMENT_TARGET: 10.9
             ARCH: arm64
       - run:
           name: "Build"
           command: make -j8
-          working_directory: ~/libvorbis-<<pipeline.parameters.VORBISVERSION>>
+          working_directory: libvorbis-<<pipeline.parameters.VORBISVERSION>>
 
   build_libflac:
     macos:
@@ -85,15 +82,15 @@ jobs:
             tar zxvf flac-<<pipeline.parameters.FLACVERSION>>.tar
       - run:
           name: "Configure build"
-          command: ./configure --enable-static --disable-shared --with-ogg-includes=~/libogg-<<pipeline.parameters.OGGVERSION>>/include --with-ogg-libraries=~/libogg-<<pipeline.parameters.OGGVERSION>>/src/.libs
-          working_directory: ~/flac-<<pipeline.parameters.FLACVERSION>>
+          command: ./configure --enable-static --disable-shared --with-ogg-includes=../libogg-<<pipeline.parameters.OGGVERSION>>/include --with-ogg-libraries=../libogg-<<pipeline.parameters.OGGVERSION>>/src/.libs
+          working_directory: flac-<<pipeline.parameters.FLACVERSION>>
           environment:
             MACOSX_DEPLOYMENT_TARGET: 10.9
             ARCH: arm64
       - run:
           name: "Build"
           command: make -j8
-          working_directory: ~/flac-<<pipeline.parameters.FLACVERSION>>
+          working_directory: flac-<<pipeline.parameters.FLACVERSION>>
 
   build_libopus:
     macos:
@@ -108,14 +105,14 @@ jobs:
       - run:
           name: "Configure build"
           command: ./configure --disable-shared
-          working_directory: ~/opus-<<pipeline.parameters.OPUSVERSION>>
+          working_directory: opus-<<pipeline.parameters.OPUSVERSION>>
           environment:
             MACOSX_DEPLOYMENT_TARGET: 10.9
             ARCH: arm64
       - run:
           name: "Build"
           command: make -j8
-          working_directory: ~/opus-<<pipeline.parameters.OPUSVERSION>>
+          working_directory: opus-<<pipeline.parameters.OPUSVERSION>>
 
   build_mpg123:
     macos:
@@ -137,7 +134,7 @@ jobs:
       - run:
           name: "Build"
           command: make -j8
-          working_directory: ~/mpg123-<<pipeline.parameters.MPG123VERSION>>
+          working_directory: mpg123-<<pipeline.parameters.MPG123VERSION>>
 
   build_liblame:
     macos:
@@ -152,14 +149,14 @@ jobs:
       - run:
           name: "Configure build"
           command: ./configure --disable-shared --enable-static
-          working_directory: ~/lame-<<pipeline.parameters.LAMEVERSION>>
+          working_directory: lame-<<pipeline.parameters.LAMEVERSION>>
           environment:
             MACOSX_DEPLOYMENT_TARGET: 10.9
             ARCH: arm64
       - run:
           name: "Build"
           command: make -j8
-          working_directory: ~/lame-<<pipeline.parameters.LAMEVERSION>>
+          working_directory: lame-<<pipeline.parameters.LAMEVERSION>>
 
   build_libsndfile:
     macos:
@@ -174,7 +171,7 @@ jobs:
       - run:
           name: "Configure build"
           command: ./configure --disable-static --disable-sqlite --disable-alsa
-          working_directory: ~/libsndfile-<<pipeline.parameters.SNDFILE_VERSION>>
+          working_directory: libsndfile-<<pipeline.parameters.SNDFILE_VERSION>>
           environment:
             MACOSX_DEPLOYMENT_TARGET: 10.9
             ARCH: arm64
@@ -183,7 +180,7 @@ jobs:
       - run:
           name: "Build"
           command: make -j8
-          working_directory: ~/libsndfile-<<pipeline.parameters.SNDFILE_VERSION>>          
+          working_directory: libsndfile-<<pipeline.parameters.SNDFILE_VERSION>>          
 
 workflows:
   build_mac_arm64:
