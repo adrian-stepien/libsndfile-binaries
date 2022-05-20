@@ -1,26 +1,53 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine.
-# See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 
-# Define a job to be invoked later in a workflow.
-# See: https://circleci.com/docs/2.0/configuration-reference/#jobs
-jobs:
-  say-hello:
-    # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
-    docker:
-      - image: cimg/base:stable
-    # Add steps to the job
-    # See: https://circleci.com/docs/2.0/configuration-reference/#steps
-    steps:
-      - checkout
-      - run:
-          name: "Say hello"
-          command: "echo Hello, World!"
+parameters:
+  OGGVERSION:
+    type: string
+    default: "1.3.5"
+  VORBISVERSION:
+    type: string
+    default: "1.3.7"
+  FLACVERSION:
+    type: string
+    default: "1.3.3"
+  OPUSVERSION:
+    type: string
+    default: "1.3.1"
+  MPG123VERSION:
+    type: string
+    default: "1.29.3"
+  LAMEVERSION:
+    type: string
+    default: "3.100"        
+  SNDFILE_VERSION:
+    type: string
+    default: "1.1.0"
+  SNDFILENAME:
+    type: string
+    default: libsndfile-<< pipeline.parameters.SNDFILE_VERSION>>
 
-# Invoke jobs via workflows
-# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
+
+jobs:
+  build_libvorbis:
+    macos:
+      xcode: 13.3
+    steps:
+      - run:
+          name: "Fetch library"
+          command: curl -LO https://downloads.xiph.org/releases/ogg/libogg-<<pipeline.parameters.OGGVERSION>>.tar.gz
+      - run:
+          name: "Unpack library"
+          command: tar zxvf libogg-<<pipeline.parameters.OGGVERSION>>.tar.gz
+      - run:
+          name: "Configure build"
+          command: ./configure --disable-shared
+          working_directory: ./libogg-<<pipeline.parameters.OGGVERSION>>
+      - run:
+          name: "Build"
+          command: make -j8
+          working_directory: ./libogg-<<pipeline.parameters.OGGVERSION>>
+
 workflows:
-  say-hello-workflow:
+  build_mac_arm64:
     jobs:
-      - say-hello
+      - build_libvorbis
