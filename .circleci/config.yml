@@ -42,11 +42,17 @@ jobs:
           name: "Configure build"
           command: ./configure --disable-shared
           working_directory: ./libogg-<<pipeline.parameters.OGGVERSION>>
+          environment:
+            MACOSX_DEPLOYMENT_TARGET: 10.9
+            ARCH: arm64
       - run:
           name: "Build"
           command: make -j8
           working_directory: ./libogg-<<pipeline.parameters.OGGVERSION>>
-
+      - run:
+          name: "Check architectures"
+          command: file .libs/libogg.a
+          working_directory: ./libogg-<<pipeline.parameters.OGGVERSION>>
 workflows:
   build_mac_arm64:
     jobs:
