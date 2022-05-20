@@ -25,10 +25,16 @@ parameters:
   SNDFILENAME:
     type: string
     default: libsndfile-<< pipeline.parameters.SNDFILE_VERSION>>
+  OGG_INCDIR: 
+    type: string
+    default: ./libogg-<<pipeline.parameters.OGGVERSION>>/include
+  OGG_LIBDIR: 
+    type: string
+    default: ./libogg-<<pipeline.parameters.OGGVERSION>>/src/.libs
 
 
 jobs:
-  build_libvorbis:
+  build_libogg:
     macos:
       xcode: 13.3
     steps:
@@ -49,11 +55,56 @@ jobs:
           name: "Build"
           command: make -j8
           working_directory: ./libogg-<<pipeline.parameters.OGGVERSION>>
+
+  build_libvorbis:
+    macos:
+      xcode: 13.3
+    steps:
       - run:
-          name: "Check architectures"
-          command: file .libs/libogg.a
-          working_directory: ./libogg-<<pipeline.parameters.OGGVERSION>>
+          name: "Fetch library"
+          command: curl -LO https://downloads.xiph.org/releases/vorbis/libvorbis-<<pipeline.parameters.VORBISVERSION>>.tar.gz
+      - run:
+          name: "Unpack library"
+          command: tar zxvf libvorbis-<<pipeline.parameters.VORBISVERSION>>.tar.gz
+      - run:
+          name: "Configure build"
+          command: ./configure --disable-shared --with-ogg-includes=<<pipeline.parameters.OGG_INCDIR>> --with-ogg-libraries=<<pipeline.parameters.OGG_LIBDIR>>
+          working_directory: ./libogg-<<pipeline.parameters.VORBISVERSION>>
+          environment:
+            MACOSX_DEPLOYMENT_TARGET: 10.9
+            ARCH: arm64
+      - run:
+          name: "Build"
+          command: make -j8
+          working_directory: ./libogg-<<pipeline.parameters.VORBISVERSION>>
+
+  build_libflac:
+    macos:
+      xcode: 13.3
+    steps:
+      - run:
+          name: "Fetch library"
+          command: curl -LO https://downloads.xiph.org/releases/flac/flac-<<pipeline.parameters.FLACVERSION>>.tar.xz
+      - run:
+          name: "Unpack library"
+          command: |
+            unxz flac-<<pipeline.parameters.FLACVERSION>>.tar.xz 
+            tar zxvf flac-<<pipeline.parameters.FLACVERSION>>.tar
+      - run:
+          name: "Configure build"
+          command: ./configure --enable-static --disable-shared --with-ogg-includes=<<pipeline.parameters.OGG_INCDIR>> --with-ogg-libraries=<<pipeline.parameters.OGG_LIBDIR>>
+          working_directory: ./flac-<<pipeline.parameters.FLACVERSION>>
+          environment:
+            MACOSX_DEPLOYMENT_TARGET: 10.9
+            ARCH: arm64
+      - run:
+          name: "Build"
+          command: make -j8
+          working_directory: ./flac-<<pipeline.parameters.FLACVERSION>>
+
 workflows:
   build_mac_arm64:
     jobs:
-      - build_libvorbis
+      - build_libogg
+      - build_libvorbis   
+      - build_libflac 
