@@ -27,10 +27,10 @@ parameters:
     default: libsndfile-<< pipeline.parameters.SNDFILE_VERSION>>
   OGG_INCDIR: 
     type: string
-    default: ./libogg-<<pipeline.parameters.OGGVERSION>>/include
+    default: libogg-<<pipeline.parameters.OGGVERSION>>/include
   OGG_LIBDIR: 
     type: string
-    default: ./libogg-<<pipeline.parameters.OGGVERSION>>/src/.libs
+    default: libogg-<<pipeline.parameters.OGGVERSION>>/src/.libs
 
 
 jobs:
@@ -47,14 +47,14 @@ jobs:
       - run:
           name: "Configure build"
           command: ./configure --disable-shared
-          working_directory: ./libogg-<<pipeline.parameters.OGGVERSION>>
+          working_directory: libogg-<<pipeline.parameters.OGGVERSION>>
           environment:
             MACOSX_DEPLOYMENT_TARGET: 10.9
             ARCH: arm64
       - run:
           name: "Build"
           command: make -j8
-          working_directory: ./libogg-<<pipeline.parameters.OGGVERSION>>
+          working_directory: libogg-<<pipeline.parameters.OGGVERSION>>
 
   build_libvorbis:
     macos:
@@ -69,14 +69,14 @@ jobs:
       - run:
           name: "Configure build"
           command: ./configure --disable-shared --with-ogg-includes=../<<pipeline.parameters.OGG_INCDIR>> --with-ogg-libraries=../<<pipeline.parameters.OGG_LIBDIR>>
-          working_directory: ./libvorbis-<<pipeline.parameters.VORBISVERSION>>
+          working_directory: libvorbis-<<pipeline.parameters.VORBISVERSION>>
           environment:
             MACOSX_DEPLOYMENT_TARGET: 10.9
             ARCH: arm64
       - run:
           name: "Build"
           command: make -j8
-          working_directory: ./libvorbis-<<pipeline.parameters.VORBISVERSION>>
+          working_directory: libvorbis-<<pipeline.parameters.VORBISVERSION>>
 
   build_libflac:
     macos:
@@ -93,14 +93,80 @@ jobs:
       - run:
           name: "Configure build"
           command: ./configure --enable-static --disable-shared --with-ogg-includes=../<<pipeline.parameters.OGG_INCDIR>> --with-ogg-libraries=../<<pipeline.parameters.OGG_LIBDIR>>
-          working_directory: ./flac-<<pipeline.parameters.FLACVERSION>>
+          working_directory: flac-<<pipeline.parameters.FLACVERSION>>
           environment:
             MACOSX_DEPLOYMENT_TARGET: 10.9
             ARCH: arm64
       - run:
           name: "Build"
           command: make -j8
-          working_directory: ./flac-<<pipeline.parameters.FLACVERSION>>
+          working_directory: flac-<<pipeline.parameters.FLACVERSION>>
+
+  build_libopus:
+    macos:
+      xcode: 13.3
+    steps:
+      - run:
+          name: "Fetch library"
+          command: curl -LO https://archive.mozilla.org/pub/opus/opus-<<pipeline.parameters.OPUSVERSION>>.tar.gz
+      - run:
+          name: "Unpack library"
+          command: tar zxvf opus-<<pipeline.parameters.OPUSVERSION>>.tar.gz
+      - run:
+          name: "Configure build"
+          command: ./configure --disable-shared
+          working_directory: opus-<<pipeline.parameters.OPUSVERSION>>
+          environment:
+            MACOSX_DEPLOYMENT_TARGET: 10.9
+            ARCH: arm64
+      - run:
+          name: "Build"
+          command: make -j8
+          working_directory: flac-<<pipeline.parameters.OPUSVERSION>>
+
+  build_mpg123:
+    macos:
+      xcode: 13.3
+    steps:
+      - run:
+          name: "Fetch library"
+          command: curl -LO https://deac-ams.dl.sourceforge.net/project/mpg123/mpg123/$MPG123VERSION/mpg123-<<pipeline.parameters.MPG123VERSION>>.tar.bz2
+      - run:
+          name: "Unpack library"
+          command: tar zxvf mpg123-<<pipeline.parameters.MPG123VERSION>>.tar.bz2
+      - run:
+          name: "Configure build"
+          command: ./configure --disable-shared --enable-static
+          working_directory: mpg123-<<pipeline.parameters.MPG123VERSION>>
+          environment:
+            MACOSX_DEPLOYMENT_TARGET: 10.9
+            ARCH: arm64
+      - run:
+          name: "Build"
+          command: make -j8
+          working_directory: mpg123-<<pipeline.parameters.MPG123VERSION>>
+
+  build_liblame:
+    macos:
+      xcode: 13.3
+    steps:
+      - run:
+          name: "Fetch library"
+          command: curl -LO https://deac-ams.dl.sourceforge.net/project/lame/lame/$LAMEVERSION/lame-<<pipeline.parameters.LAMEVERSION>>.tar.gz
+      - run:
+          name: "Unpack library"
+          command: tar zxvf lame-<<pipeline.parameters.LAMEVERSION>>.tar.gz
+      - run:
+          name: "Configure build"
+          command: ./configure --disable-shared --enable-static
+          working_directory: lame-<<pipeline.parameters.LAMEVERSION>>
+          environment:
+            MACOSX_DEPLOYMENT_TARGET: 10.9
+            ARCH: arm64
+      - run:
+          name: "Build"
+          command: make -j8
+          working_directory: lame-<<pipeline.parameters.LAMEVERSION>>       
 
 workflows:
   build_mac_arm64:
@@ -112,3 +178,7 @@ workflows:
       - build_libflac:
            requires: 
             - build_libogg
+      - build_libopus
+      - build_mpg123
+      - build_liblame
+
